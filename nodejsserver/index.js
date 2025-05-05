@@ -43,7 +43,6 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // <— handles preflight requests safely
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Credentials", "true");
