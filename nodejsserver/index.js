@@ -1,7 +1,8 @@
+// index.js
 require('dotenv').config();
 const express = require('express');
-const cors = require('cors');
-const bcrypt = require('bcryptjs');
+const cors = require('cors'); // Import CORS
+const bcrypt = require('bcryptjs'); // Import bcrypt for password hashing
 const multer = require('multer');
 const {
   S3Client,
@@ -9,15 +10,15 @@ const {
   ListObjectsV2Command
 } = require('@aws-sdk/client-s3');
 const { v4: uuid } = require('uuid');
-
 const app = express();
 const port = process.env.PORT || 5000;
+
 const db = require('./db');
+
 const allowedOrigins = [
   'https://hollywoodchase.github.io', // ✅ your GitHub Pages frontend
   'http://localhost:3000'             // ✅ optional: local dev
 ];
-
 // —— Configure S3 & multer ———————————————————————————
 const upload = multer();  // in‑memory storage for file uploads
 const s3 = new S3Client({
@@ -28,8 +29,7 @@ const s3 = new S3Client({
   }
 });
 
-// ————————————————————————————————————————————————————————
-
+// ——————
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -44,7 +44,7 @@ app.use((req, res, next) => {
   res.header("Access-Control-Allow-Credentials", "true");
   next();
 });
-
+// Increase limit to handle profile image in Base64 (e.g. 2MB)
 // Parse JSON bodies (up to 5MB for images)
 app.use(express.json({ limit: '5mb' }));
 
@@ -126,6 +126,8 @@ app.get('/api/gallery', async (req, res) => {
   }
 });
 
+
+
 // Test Database Connection Endpoint
 app.get('/test-db', async (req, res) => {
   try {
@@ -137,7 +139,7 @@ app.get('/test-db', async (req, res) => {
   }
 });
 
-// Root Endpoint
+// Root Endpoint (for testing purposes)
 app.get('/', (req, res) => {
   res.send('Backend is running');
 });
@@ -158,6 +160,7 @@ app.get('/users', async (req, res) => {
 app.post('/users', async (req, res) => {
   const { username, password, secret, fav_park, profile_image } = req.body;
   try {
+    // Hash the password with a salt round of 10
     const hashedPassword = await bcrypt.hash(password, 10);
     const result = await db.query(
       'INSERT INTO user_accounts (username, password, secret, fav_park, profile_image) VALUES (?, ?, ?, ?, ?)',
@@ -168,13 +171,14 @@ app.post('/users', async (req, res) => {
     console.error('Error creating user:', error);
     res.status(500).json({ error: 'Failed to create user' });
   }
+  
 });
 
 // New Login Endpoint
 app.post('/login', async (req, res) => {
-  const { username, password } = req.body;
+  const { username, password } = req.body; // ✅ updated from email to username
   try {
-    const normalizedUsername = username.trim().toLowerCase();
+    const normalizedUsername = username.trim().toLowerCase(); // optional: normalize case
     const [users] = await db.query(
       'SELECT * FROM user_accounts WHERE LOWER(username) = ?',
       [normalizedUsername]
@@ -194,9 +198,10 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Recover Account Endpoint
+
+// NEW: Recover Account Endpoint
 app.post('/recover', async (req, res) => {
-  const { username, secretWord } = req.body;
+  const { username, secretWord } = req.body; // ✅ updated from email to username
   try {
     const [users] = await db.query(
       'SELECT * FROM user_accounts WHERE username = ?',
@@ -216,7 +221,8 @@ app.post('/recover', async (req, res) => {
   }
 });
 
-// Get Account Settings for a User by ID
+
+// NEW: Get Account Settings for a User by ID
 app.get('/users/:id', async (req, res) => {
   const userId = req.params.id;
   try {
@@ -234,11 +240,13 @@ app.get('/users/:id', async (req, res) => {
   }
 });
 
-// Update Account Settings for a User by ID
+// NEW: Update Account Settings for a User by ID
 app.put('/users/:id', async (req, res) => {
   const userId = req.params.id;
+  // Fields to update: password, secret, fav_park, profile_image.
   const { password, secret, fav_park, profile_image } = req.body;
   try {
+    // Fetch the existing user record
     const [users] = await db.query('SELECT * FROM user_accounts WHERE user_id = ?', [userId]);
     if (users.length === 0) {
       return res.status(404).json({ error: 'User not found' });
@@ -263,32 +271,101 @@ app.put('/users/:id', async (req, res) => {
     res.status(500).json({ error: 'Failed to update user settings' });
   }
 });
-/* Liked Parks Routes */
-// Endpoint to get all liked parks
-app.get('/liked-parks', async (req, res) => {
+
+/* Liked Parks Back-End Points
+1. Get list of liked parks by userid
+2. Adding a like for the user
+3. Deleting previously like
+
+*/
+//Get list of liked parks by userid.
+app.get('/liked-parks/:userId', async (req, res) => {
+  const userId = req.params.userId;  // UserID will be contained within the URL. Retrieve it from there.
+
   try {
-    const [rows] = await db.query('SELECT * FROM liked_parks');
+    const [rows] = await db.query(
+      'SELECT liked_park FROM liked_parks WHERE user_ID = ?',
+      [userId]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'No  liked parks found' });
+    }
+
     res.json(rows);
   } catch (error) {
-    console.error('Error fetching liked parks:', error);
-    res.status(500).json({ error: 'Failed to fetch liked parks' });
+    console.error('Error fetching liked parks-backend:', error);
   }
 });
 
-// Endpoint to add a new liked park for a user
+
+//adding a like for the user
 app.post('/liked-parks', async (req, res) => {
-  const { user_ID, liked_park } = req.body;
+  const { userId, parkName } = req.body;  // Get userId and park names from request
+
   try {
-    const result = await db.query(
-      'INSERT INTO liked_parks (user_ID, liked_park) VALUES (?, ?)',
-      [user_ID, liked_park]
+    const [userRows] = await db.query(
+      'SELECT * FROM user_accounts WHERE user_id = ?',
+      [userId]
     );
-    res.json({ message: 'Liked park added', likedParkId: result[0].insertId });
+    
+    if (userRows.length === 0) {
+      return res.status(404).json({ error: 'User not found-backend' });
+    }
+
+    // Check if the park is already liked by the user
+    const [existingRows] = await db.query(
+      'SELECT * FROM liked_parks WHERE user_id = ? AND liked_park = ?',
+      [userId, parkName]
+    );
+
+    if (existingRows.length > 0) {
+      return res.status(400).json({ error: 'Park already liked-backend' });
+    }
+
+    // Insert the new liked park into the liked_parks table
+    await db.query(
+      'INSERT INTO liked_parks (user_id, liked_park) VALUES (?, ?)',
+      [userId, parkName]
+    );
+
+    res.status(200).json({ message: 'Park liked successfully-backend' });
   } catch (error) {
-    console.error('Error adding liked park:', error);
-    res.status(500).json({ error: 'Failed to add liked park' });
+    console.error('Error adding liked park-backend:', error);
+    res.status(500).json({ error: 'Failed to add liked park-backend' });
   }
 });
+
+// Remove a liked park for a user
+app.delete('/liked-parks', async (req, res) => {
+  const { userId, parkName } = req.body;  // Get userId and park names from the request
+
+  try {
+    const [userRows] = await db.query(
+      'SELECT * FROM user_accounts WHERE user_id = ?',
+      [userId]
+    );
+
+    if (userRows.length === 0) {
+      return res.status(404).json({ error: 'User not found-backend' });
+    }
+
+    // Delete the liked park from the liked_parks table
+    const [result] = await db.query(
+      'DELETE FROM liked_parks WHERE user_id = ? AND liked_park = ?',
+      [userId, parkName]
+    );
+
+    res.status(200).json({ message: 'Park unliked successfully' });
+  } catch (error) {
+    console.error('Error removing liked park-backend:', error);
+    res.status(500).json({ error: 'Failed to remove liked park-backend' });
+  }
+});
+
+
+
+
 // Start the Server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
