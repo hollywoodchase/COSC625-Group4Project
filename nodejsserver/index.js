@@ -292,10 +292,6 @@ app.get('/liked-parks/:userId', async (req, res) => {
       [userId]
     );
 
-    if (rows.length === 0) {
-      return res.status(404).json({ message: 'No  liked parks found' });
-    }
-
     res.json(rows);
   } catch (error) {
     console.error('Error fetching liked parks-backend:', error);
