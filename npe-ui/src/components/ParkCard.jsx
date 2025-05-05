@@ -11,7 +11,7 @@ const ParkCard = ({ park }) => {
   const imageUrl = park.images?.[0]?.url || 'https://via.placeholder.com/300x200?text=No+Image';
   const description = park.description || "No description available.";
 
-  const path = "http://localhost:5000"
+  const path = process.env.REACT_APP_API_URL;
     // Fetch liked parks when component mounts
   useEffect(() => {
     if (userId) {
