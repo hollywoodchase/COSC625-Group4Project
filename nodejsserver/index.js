@@ -32,14 +32,20 @@ const s3 = new S3Client({
 // ——————
 app.use(cors({
   origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      console.log(`Blocked by CORS: ${origin}`);
       callback(new Error('Not allowed by CORS'));
     }
   },
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
+app.options('*', cors()); // Respond OK to all preflight OPTIONS requests
+
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Credentials", "true");
   next();
