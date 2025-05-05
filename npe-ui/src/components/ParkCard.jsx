@@ -66,7 +66,7 @@ const ParkCard = ({ park }) => {
 
   return (
     <div
-      className="bg-white rounded-xl shadow-md p-4 hover:-translate-y-1 transition-transform cursor-pointer"
+      className="relative bg-white rounded-xl shadow-md p-4 hover:-translate-y-1 transition-transform cursor-pointer"
       onClick={() => navigate(`/COSC625-Group4Project/parks/${park.parkCode}`)}
     >
       <img
