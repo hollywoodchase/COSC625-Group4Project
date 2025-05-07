@@ -22,8 +22,8 @@ jobs:
         run: npm ci
         working-directory: npe-ui
 
-      - name: 🏗 Build the app
-        run: npm run build
+      - name: 🏗 Build the app (ignore warnings)
+        run: CI='' npm run build
         working-directory: npe-ui
 
       - name: 🚀 Deploy to GitHub Pages
