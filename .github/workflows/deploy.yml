@@ -22,9 +22,14 @@ jobs:
         run: npm ci
         working-directory: npe-ui
 
-      - name: 🏗 Build the app (ignore warnings)
+      - name: 🏗 Build the app (suppress CI warnings)
         run: CI='' npm run build
         working-directory: npe-ui
+
+      - name: 🛠 Configure Git identity
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: 🚀 Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
