@@ -15,7 +15,8 @@ jobs:
         with:
           node-version: 18
 
-      - run: npm ci
+      - name: Install dependencies
+        run: npm install
         working-directory: npe-ui
 
       - run: CI='' npm run build
