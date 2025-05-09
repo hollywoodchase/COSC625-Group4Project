@@ -34,3 +34,19 @@ export const fetchWebcamData = async (parkCode) => {
   const data = await res.json();
   return data.data;
 };
+
+export const fetchNpsAlerts = async () => {
+  const url = `${BASE_URL}/alerts?api_key=${API_KEY}&limit=10`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('Failed to fetch alerts');
+  const data = await res.json();
+  return data.data;
+};
+
+export const fetchActivities = async () => {
+  const url = `${BASE_URL}/activities?api_key=${API_KEY}&limit=50`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('Failed to fetch activities');
+  const data = await res.json();
+  return data.data;
+};

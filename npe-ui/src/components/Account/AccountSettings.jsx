@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import AlertPreferences from './AlertPreferences';
 
 const API_KEY = "wT7qTdbCiApVc0O9U4sDpW0AEFgcfmyB8fHNW42O";
 const BACKEND = "https://cosc625-group4project.onrender.com"; // e.g. http://localhost:5000
@@ -13,6 +14,11 @@ export default function AccountSettings() {
     secret: "",
     favoriteParkCode: "",
     profileImage: null, // File OR URL string
+    alertPreferences: {
+      categories: [], // Alert categories to display
+      showAll: true, // Whether to show all alerts regardless of category
+      maxAlerts: 5 // Maximum number of alerts to display
+    }
   });
 
   const [previewUrl, setPreviewUrl] = useState("/images/profile-placeholder.jpg");  // Default fallback
@@ -67,6 +73,11 @@ export default function AccountSettings() {
             secret: data.secret || "",
             favoriteParkCode: matchedParkCode,
             profileImage: data.profile_image || null,
+            alertPreferences: data.alert_preferences || {
+              categories: ['park-closure', 'danger', 'caution', 'information', 'weather'],
+              showAll: true,
+              maxAlerts: 5
+            }
           });
         }
       } catch (error) {
@@ -100,6 +111,13 @@ export default function AccountSettings() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+  
+  const handleAlertPreferencesChange = (newPreferences) => {
+    setFormData(prev => ({
+      ...prev,
+      alertPreferences: newPreferences
+    }));
   };
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -149,6 +167,7 @@ export default function AccountSettings() {
         parks.find((p) => p.parkCode === formData.favoriteParkCode)?.fullName ||
         "",
       profile_image: uploadedUrl, // Send the uploaded URL to be saved in the database
+      alert_preferences: formData.alertPreferences, // Save alert preferences
     };
 
     try {
@@ -161,6 +180,24 @@ export default function AccountSettings() {
         const errData = await res.json();
         throw new Error(errData.error || "update failed");
       }
+      // Save alert preferences to localStorage for immediate use
+      try {
+        localStorage.setItem(`user-${currentUserId}-preferences`, JSON.stringify({
+          alertPreferences: formData.alertPreferences
+        }));
+        
+        // Notify other components about the preference change
+        if (window.updateAlertPreferences) {
+          window.updateAlertPreferences();
+        } else {
+          // Fallback if the global function isn't defined yet
+          window.dispatchEvent(new Event('preferencesUpdated'));
+          window.dispatchEvent(new Event('storage'));
+        }
+      } catch (e) {
+        console.warn('Failed to save preferences to localStorage:', e);
+      }
+      
       alert("Account settings saved!");
     } catch (err) {
       console.error("Error updating settings:", err);
@@ -249,8 +286,16 @@ export default function AccountSettings() {
             className="block text-sm text-gray-600"
           />
         </div>
+        
+        <div className="mt-8 mb-6">
+          <h3 className="text-xl font-semibold mb-4">Notification Settings</h3>
+          <AlertPreferences 
+            savedPreferences={formData.alertPreferences}
+            onPreferencesChange={handleAlertPreferencesChange}
+          />
+        </div>
 
-        <div className="flex space-x-4">
+        <div className="flex space-x-4 mt-8">
           <button
             type="submit"
             className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
