@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import AlertPreferences from './AlertPreferences';
-
 const API_KEY = "wT7qTdbCiApVc0O9U4sDpW0AEFgcfmyB8fHNW42O";
 const BACKEND = "https://cosc625-group4project.onrender.com"; // e.g. http://localhost:5000
 
@@ -79,6 +78,10 @@ export default function AccountSettings() {
               maxAlerts: 5
             }
           });
+        // Make sure to update previewUrl after fetching profileImage
+        if (data.profile_image) {
+          setPreviewUrl(data.profile_image); // Ensure profile image URL is set
+        }
         }
       } catch (error) {
         console.error("Error fetching user settings:", error);
@@ -112,7 +115,6 @@ export default function AccountSettings() {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-  
   const handleAlertPreferencesChange = (newPreferences) => {
     setFormData(prev => ({
       ...prev,
@@ -286,7 +288,7 @@ export default function AccountSettings() {
             className="block text-sm text-gray-600"
           />
         </div>
-        
+
         <div className="mt-8 mb-6">
           <h3 className="text-xl font-semibold mb-4">Notification Settings</h3>
           <AlertPreferences 
