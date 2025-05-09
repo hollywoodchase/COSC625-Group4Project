@@ -44,13 +44,14 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Credentials", "true");
   next();
 });
 // Increase limit to handle profile image in Base64 (e.g. 2MB)
-app.use(express.json({ limit: '5mb' }));
+// Parse JSON bodies (up to 50MB for images)
+app.use(express.json({ limit: '50mb' }));
+
 // ——— Updated: S3 file‑upload endpoint ———————————————————
 // Now "userId" is optional—if provided, we prefix the key.
 // Also accepts an optional "folder" field ("gallery" or "profile")
@@ -105,9 +106,10 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
 });
 // ————————————————————————————————————————————————————————
 
-/* New: List a user’s gallery straight from S3 */
+/* Updated: List a user’s gallery straight from S3 with filtering */
 app.get('/api/gallery', async (req, res) => {
   const userId = req.query.userId;
+  const filter = req.query.filter || "all"; // Default to "all" if no filter is provided
   if (!userId) {
     return res.status(400).json({ error: 'No userId provided' });
   }
@@ -118,9 +120,22 @@ app.get('/api/gallery', async (req, res) => {
       Prefix: `${userId}/gallery/`
     }));
 
-    const urls = Contents
-      .filter(obj => obj.Key && !obj.Key.endsWith('/'))
-      .map(obj => `https://${process.env.S3_BUCKET}.s3.amazonaws.com/${obj.Key}`);
+    // Filter the objects based on the 'filter' query parameter
+    let filteredContents;
+    if (filter === "image") {
+      filteredContents = Contents.filter(obj =>
+        obj.Key && !obj.Key.endsWith('/') && obj.Key.match(/\.(jpg|jpeg|png|gif)$/i) // Image extensions
+      );
+    } else if (filter === "video") {
+      filteredContents = Contents.filter(obj =>
+        obj.Key && !obj.Key.endsWith('/') && obj.Key.match(/\.(mp4|mov|avi)$/i) // Video extensions
+      );
+    } else {
+      filteredContents = Contents.filter(obj => obj.Key && !obj.Key.endsWith('/')); // All media
+    }
+
+    // Map the filtered results into an array of URLs
+    const urls = filteredContents.map(obj => `https://${process.env.S3_BUCKET}.s3.amazonaws.com/${obj.Key}`);
 
     res.json(urls);
   } catch (err) {
@@ -128,6 +143,7 @@ app.get('/api/gallery', async (req, res) => {
     res.status(500).json({ error: 'Failed to list gallery' });
   }
 });
+
 
 
 
@@ -174,6 +190,7 @@ app.post('/users', async (req, res) => {
     console.error('Error creating user:', error);
     res.status(500).json({ error: 'Failed to create user' });
   }
+  
 });
 
 // New Login Endpoint
@@ -273,6 +290,7 @@ app.put('/users/:id', async (req, res) => {
     res.status(500).json({ error: 'Failed to update user settings' });
   }
 });
+
 /* Liked Parks Back-End Points
 1. Get list of liked parks by userid
 2. Adding a like for the user
@@ -294,6 +312,7 @@ app.get('/liked-parks/:userId', async (req, res) => {
     console.error('Error fetching liked parks-backend:', error);
   }
 });
+
 
 //adding a like for the user
 app.post('/liked-parks', async (req, res) => {
