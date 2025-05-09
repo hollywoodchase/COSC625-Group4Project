@@ -44,14 +44,13 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Credentials", "true");
   next();
 });
 // Increase limit to handle profile image in Base64 (e.g. 2MB)
-// Parse JSON bodies (up to 5MB for images)
 app.use(express.json({ limit: '5mb' }));
-
 // ——— Updated: S3 file‑upload endpoint ———————————————————
 // Now "userId" is optional—if provided, we prefix the key.
 // Also accepts an optional "folder" field ("gallery" or "profile")
@@ -175,7 +174,6 @@ app.post('/users', async (req, res) => {
     console.error('Error creating user:', error);
     res.status(500).json({ error: 'Failed to create user' });
   }
-  
 });
 
 // New Login Endpoint
@@ -275,7 +273,6 @@ app.put('/users/:id', async (req, res) => {
     res.status(500).json({ error: 'Failed to update user settings' });
   }
 });
-
 /* Liked Parks Back-End Points
 1. Get list of liked parks by userid
 2. Adding a like for the user
@@ -297,7 +294,6 @@ app.get('/liked-parks/:userId', async (req, res) => {
     console.error('Error fetching liked parks-backend:', error);
   }
 });
-
 
 //adding a like for the user
 app.post('/liked-parks', async (req, res) => {
@@ -369,4 +365,72 @@ app.delete('/liked-parks', async (req, res) => {
 // Start the Server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
+});
+// Endpoint to get reviews for a specific park
+app.get('/reviews', async (req, res) => {
+  const { parkCode } = req.query;
+  try {
+    const [rows] = await db.query(
+      'SELECT * FROM user_reviews WHERE park_code = ?',
+      [parkCode]
+    );
+    res.json(rows);
+  } catch (error) {
+    console.error('Error fetching reviews:', error);
+    res.status(500).json({ error: 'Failed to fetch reviews' });
+  }
+});
+
+// Endpoint to add a new review for a park
+app.post('/reviews', async (req, res) => {
+  const { name, review, star_rating, parkCode } = req.body;
+  try {
+    const result = await db.query(
+      'INSERT INTO user_reviews (name, review, star_rating, park_code) VALUES (?, ?, ?, ?)',
+      [name, review, star_rating, parkCode]
+    );
+    const review_id = result[0].insertId;
+    res.json({
+      review_id,
+      name,
+      review,
+      star_rating,
+      park_code: parkCode
+    });
+  } catch (error) {
+    console.error('Error adding review:', error);
+    res.status(500).json({ error: 'Failed to add review' });
+  }
+});
+
+
+
+// Endpoint to get visit history
+app.get('/visit-history', async (req, res) => {
+  const { user_id } = req.query; 
+  try {
+    const [rows] = await db.query(
+      'SELECT park_name, visit_date FROM visit_history WHERE user_id = ? ORDER BY visit_date ASC',
+      [user_id]
+    );
+    res.json(rows);
+  } catch (error) {
+    console.error('Error fetching visit history:', error);
+    res.status(500).json({ error: 'Failed to fetch visit history' });
+  }
+});
+
+// Endpoint to add a new visit to the history
+app.post('/visit-history', async (req, res) => {
+  const { user_id, park, date } = req.body; 
+  try {
+    const result = await db.query(
+      'INSERT INTO visit_history (user_id, park_name, visit_date) VALUES (?, ?, ?)',
+      [user_id, park, date]
+    );
+    res.json({ id: result[0].insertId, user_id, park, date });
+  } catch (error) {
+    console.error('Error adding visit to history:', error);
+    res.status(500).json({ error: 'Failed to add visit to history' });
+  }
 });
