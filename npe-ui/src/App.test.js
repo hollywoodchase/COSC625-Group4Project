@@ -1,15 +1,15 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import App from './App';
-import { AuthProvider } from './context/AuthContext'; // ✅ Import your context provider
+import { AuthProvider } from './context/AuthContext';
 
-test('renders learn react link', () => {
+test('renders navbar with National Park Explorer', () => {
   render(
-    <AuthProvider>  {/* ✅ Wrap App with provider */}
+    <AuthProvider>
       <App />
     </AuthProvider>
   );
 
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  const brandText = screen.getByText(/national park explorer/i);
+  expect(brandText).toBeInTheDocument();
 });
