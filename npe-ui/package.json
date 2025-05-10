@@ -20,6 +20,10 @@
     "web-vitals": "^2.1.4"
   },
   "homepage": "https://hollywoodchase.github.io/COSC625-Group4Project/",
+  "repository": {
+  "type": "git",
+  "url": "https://github.com/hollywoodchase/COSC625-Group4Project.git"
+  },
   "scripts": {
     "predeploy": "CI='' npm run build",
     "deploy": "gh-pages -d build",

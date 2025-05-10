@@ -23,15 +23,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build project (skip CI strict mode)
-        run: CI='' npm run build
-
       - name: Configure Git identity for deployment
         run: |
           git config --global user.email "ci@github.com"
           git config --global user.name "GitHub Actions"
 
       - name: Deploy to GitHub Pages
-        run: npm run deploy
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npx gh-pages -d build -u "github-actions-bot <ci@github.com>"
