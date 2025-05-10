@@ -21,7 +21,7 @@
   },
   "homepage": "https://hollywoodchase.github.io/COSC625-Group4Project/",
   "scripts": {
-    "predeploy": "npm run build",
+    "predeploy": "CI='' npm run build",
     "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "GENERATE_SOURCEMAP=false react-scripts build || true",

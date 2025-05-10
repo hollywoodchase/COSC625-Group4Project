@@ -26,6 +26,11 @@ jobs:
       - name: Build project (skip CI strict mode)
         run: CI='' npm run build
 
+      - name: Configure Git identity for deployment
+        run: |
+          git config --global user.email "dannyjcalise@gmail.com"
+          git config --global user.name "Danny Calise"
+
       - name: Deploy to GitHub Pages
         run: npm run deploy
         env:
