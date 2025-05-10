@@ -9,6 +9,9 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: npe-ui
 
     steps:
       - name: Checkout code
@@ -19,20 +22,11 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Cache node modules
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-
       - name: Install dependencies
-        run: npm install
-        working-directory: npe-ui
+        run: npm ci
 
       - name: Run tests
         run: npm test -- --watchAll=false
-        working-directory: npe-ui
 
-      - name: Build project (ignore warnings)
-        run: CI='' npm run build
-        working-directory: npe-ui
+      - name: Build project
+        run: npm run build
