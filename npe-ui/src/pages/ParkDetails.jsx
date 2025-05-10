@@ -3,12 +3,14 @@ import { useParams } from 'react-router-dom';
 import HeroSection from '../components/HeroSection';
 import Tabs from '../components/Tabs';
 import { fetchParkDetails, fetchWebcamData } from '../services/npsApi';
+import Papa from 'papaparse';
 
 const ParkDetails = () => {
   const { parkCode } = useParams();
   const [park, setPark] = useState(null);
   const [webcams, setWebcams] = useState([]);
   const [reviews, setReviews] = useState([]);
+  const [visitationData, setVisitationData] = useState([]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -36,7 +38,39 @@ const ParkDetails = () => {
     };
 
     loadData();
+
+    //This is the visitor table fetch
+    fetch(`${process.env.PUBLIC_URL}/data/NPS_MonthlyNPStats_2024.csv`)
+      .then(res => {
+        console.log('Fetching CSV file successful');
+        return res.text(); 
+      })
+      .then(csvresText => {
+        Papa.parse(csvresText, {
+          header: true,
+          skipEmptyLines: true,
+          transformHeader: (header) => header.trim(),
+          complete: (result) => {
+
+            const cleaned = result.data.map(row => ({
+              ...row,
+              Month: parseInt(row.Month, 10),
+              MonthlyVisits: parseInt(row.MonthlyVisits?.replace(/,/g, '') || 0, 10),
+              AnnualTotalVisits: parseInt(row.AnnualTotalVisits?.replace(/,/g, '') || 0, 10),
+            }));
+
+            const filtered = cleaned.filter(row => row.UnitCode === parkCode.toUpperCase());
+            setVisitationData(filtered);
+          },
+          error: (error) => {
+            console.error("Error parsing CSV: ", error);
+          }
+        });
+      });
+
   }, [parkCode]);
+
+
 
   if (!park) return <div className="p-6">Loading...</div>;
 
@@ -155,7 +189,7 @@ const ParkDetails = () => {
 
 
 
-  
+
   const reviewsContent = reviews.length > 0 ? (
     reviews.map((review) => (
       <div key={review.id} className="border rounded-lg p-4 bg-gray-100 mt-4">
@@ -167,12 +201,6 @@ const ParkDetails = () => {
   ) : (
     <p className="mt-2">No reviews available for this park.</p>
   );
-
-
-
-  
-
-
 
 
   return (
@@ -207,7 +235,29 @@ const ParkDetails = () => {
                 {reviewsContent}
               </div>
             ),
-            "Visitor Count": <p>Visitor data not available.</p>,
+            "Visitor Count": (
+
+              <div>
+                {visitationData.length > 0 ? (
+                  <ul className="list-disc list-inside space-y-1">
+                    {visitationData.map((entry, idx) => (
+                      <li key={idx}>
+                        {new Date(2024, entry.Month - 1).toLocaleString('default', { month: 'long' })}: {entry['MonthlyVisits'].toLocaleString()} visitors
+                      </li>
+                    ))}
+                    <p className="mt-2 font-semibold">
+                      2024 Annual Total: {visitationData[0]['AnnualTotalVisits'].toLocaleString()}
+                    </p>
+                    <br />
+                    <p><a href={`https://irma.nps.gov/Stats/SSRSReports/Park%20Specific%20Reports/Recreation%20Visitors%20By%20Month%20(1979%20-%20Last%20Calendar%20Year)?Park=${parkCode.toUpperCase()}`}>Click Here for the latest monthly visitation stats.</a></p>
+                  </ul>
+                ) : (
+                  <p>No visitation data available for this park.</p>
+                )}
+              </div>
+            ),
+
+
             Map: (
               <div>
                 <p>{directionsInfo}</p>
@@ -233,5 +283,6 @@ const ParkDetails = () => {
     </div>
   );
 };
+
 
 export default ParkDetails;
