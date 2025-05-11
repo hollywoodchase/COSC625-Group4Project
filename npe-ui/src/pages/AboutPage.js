@@ -4,6 +4,11 @@ import heroImage8 from '../assets/images/hero-8.jpg';
 import { Link } from 'react-router-dom';
 import { fetchNpsAlerts } from '../services/npsApi';
 import { AlertSliderWithPreferences } from '../components/AlertSlider';
+import SimDImage from '../assets/images/SimD.jpg';
+import MasonW from '../assets/images/MasonW.png';
+import DanielC from '../assets/images/DanielC.jpg';
+import CameronR from '../assets/images/CameronR.png';
+import DhrumilT from '../assets/images/DhrumilT.jpg';
 
 const AboutPage = () => {
   // Mock data for User Testimonials
@@ -69,45 +74,45 @@ const AboutPage = () => {
       name: 'Daniel Calise',
       role: '',
       bio: 'Passionate about creating intuitive user interfaces optimizing performance.',
-      image: '/images/team/daniel.jpg', 
+      image: DanielC, 
       github: 'https://github.com/hollywoodchase',
-      linkedin: 'https://www.linkedin.com/in/daniel-calise/'
+      linkedin: 'https://www.linkedin.com/in/daniel-calise'
     },
     {
       id: 2,
       name: 'Sim Dashdondog',
       role: '',
       bio: 'Creates beautiful, user-centered designs with a deep understanding.',
-      image: '/images/team/sim.jpg',
-      github: '',
-      linkedin: 'https://www.linkedin.com/in/sim-dashdondog-37b91b265/'
+      image: SimDImage,
+      github: 'https://github.com/udashdon4',
+      linkedin: 'https://www.linkedin.com/in/sim-dashdondog-37b91b265'
     },
     {
       id: 3,
       name: 'Cameron Robertson',
       role: '',
       bio: 'Experienced in database design and Backend code development.',
-      image: '/images/team/cameron.jpg',
+      image: CameronR,
       github: 'https://github.com/cfrobertson0',
-      linkedin: 'https://www.linkedin.com/in/cameronrobertson333/'
+      linkedin: 'https://www.linkedin.com/in/cameronrobertson333'
     },
     {
       id: 4,
       name: 'Mason Warner',
       role: '',
       bio: 'Dedicated to building secure and scalable server architectures.',
-      image: '/images/team/mason.jpg',
+      image: MasonW,
       github: 'https://github.com/Mason-Warner',
-      linkedin: 'https://www.linkedin.com/in/mason-warner-718b7121b/'
+      linkedin: 'https://www.linkedin.com/in/mason-warner-718b7121b'
     },
     {
       id: 5,
       name: 'Dhrumil Thakkar',
       role: '',
       bio: 'Excited about ensuring user experience and proper information.',
-      image: '/images/team/dhrumil.jpg',
+      image: DhrumilT,
       github: 'https://github.com/dhrumilvthakkar',
-      linkedin: 'https://www.linkedin.com/in/dhrumilvthakkar/'
+      linkedin: 'https://www.linkedin.com/in/dhrumilvthakkar'
     }
   ];
 
@@ -181,12 +186,15 @@ const AboutPage = () => {
                 <div className="p-6">
                   <div className="flex flex-col items-center">
                     {/* Team member avatar/placeholder */}
-                    <div 
-                      className="w-28 h-28 rounded-full bg-gradient-to-r from-green-500 to-blue-500 flex items-center justify-center text-white text-3xl font-bold mb-4 shadow-md"
-                    >
-                      {member.name.charAt(0)}
+                  <div>
+                    <img
+                      src={member.image}
+                      alt={member.name}
+                      className="w-43 h-43 rounded-full object-cover mb-4 shadow-md"
+                    />
                     </div>
-                    
+                  
+
                     <h3 className="text-xl font-bold text-gray-800">{member.name}</h3>
                     <p className="text-green-600 font-medium mb-4">{member.role}</p>
                     
