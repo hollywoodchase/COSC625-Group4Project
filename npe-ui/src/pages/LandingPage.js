@@ -118,6 +118,10 @@ const LandingPage = () => {
         {/* Dark overlay for better text readability */}
         <div className="absolute inset-0 bg-black bg-opacity-40"></div>
         
+        <div className="z-10 max-w-2xl px-4">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">Discover the Wonders of Nature.</h1>
+        </div>
+        
         {/* Dots indicators for slideshow */}
         <div className="absolute bottom-12 flex space-x-2">
           {Array.from({ length: 3 }).map((_, index) => (
