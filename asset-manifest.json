@@ -1,0 +1,26 @@
+{
+  "files": {
+    "main.css": "/COSC625-Group4Project/static/css/main.ce1d3fe9.css",
+    "main.js": "/COSC625-Group4Project/static/js/main.6eaf3359.js",
+    "static/js/206.7f3ccac8.chunk.js": "/COSC625-Group4Project/static/js/206.7f3ccac8.chunk.js",
+    "static/media/hero-7.jpg": "/COSC625-Group4Project/static/media/hero-7.5f35962ff17951e81984.jpg",
+    "static/media/hero-5.jpg": "/COSC625-Group4Project/static/media/hero-5.ba6c06a8a8cf13477e62.jpg",
+    "static/media/hero-4.jpg": "/COSC625-Group4Project/static/media/hero-4.1598b5c2131cc3d5c68e.jpg",
+    "static/media/hero-1.jpg": "/COSC625-Group4Project/static/media/hero-1.abd039c02f583d2fc7f8.jpg",
+    "static/media/hero-2.jpg": "/COSC625-Group4Project/static/media/hero-2.c121441a842c662df094.jpg",
+    "static/media/hero-8.jpg": "/COSC625-Group4Project/static/media/hero-8.83151acc687ecb2be28a.jpg",
+    "static/media/MasonW.png": "/COSC625-Group4Project/static/media/MasonW.f581acc3ed3435046a7a.png",
+    "static/media/DhrumilT.jpg": "/COSC625-Group4Project/static/media/DhrumilT.981c5059ca2b23c0ebed.jpg",
+    "static/media/SimD.jpg": "/COSC625-Group4Project/static/media/SimD.46669ce9a081a92f8be3.jpg",
+    "static/media/DanielC.jpg": "/COSC625-Group4Project/static/media/DanielC.36c2b3e236936d81ea61.jpg",
+    "static/media/hero-3.jpg": "/COSC625-Group4Project/static/media/hero-3.996a3de6109f971c6341.jpg",
+    "static/media/CameronR.png": "/COSC625-Group4Project/static/media/CameronR.5522e6a6d9c30d018661.png",
+    "static/media/nps_foundation.png": "/COSC625-Group4Project/static/media/nps_foundation.5f947dd9abbb5d24be7c.png",
+    "static/media/frostburg.png": "/COSC625-Group4Project/static/media/frostburg.2de9cb1ef1bb8ce14115.png",
+    "index.html": "/COSC625-Group4Project/index.html"
+  },
+  "entrypoints": [
+    "static/css/main.ce1d3fe9.css",
+    "static/js/main.6eaf3359.js"
+  ]
+}
