@@ -11,11 +11,11 @@ Welcome to **Park Rangers**, an interactive web platform that allows users to di
 
 Park Rangers is designed to support both casual browsers and registered users in exploring national parks through interactive features and real-time updates. The system allows users to:
 
-- View real-time crowd data for parks
+- View crowd data for parks
 - Personalize their experience through visit history
-- Browse and filter park-related photos and videos
-- Share favorite media with friends
-- Adjust account settings like notification preferences and privacy
+- Upload and filter park-related photos and videos
+- Adjust account settings like notification preferences
+- View an interative map of National Parks
 
 Our focus during this project was on building a functional MVP with real-world use cases such as family planning, outdoor exploration, and social media sharing—all in a responsive and user-friendly interface.
 
@@ -24,15 +24,20 @@ Our focus during this project was on building a functional MVP with real-world u
 ## 📸 Key Features
 
 ### ✅ Implemented in Final Iteration:
-- **User Settings:** Update notification and privacy preferences
+- **User Settings:** Update notification preferences
 - **Visit History Tracking:** Logged and guest users can view parks they’ve visited
 - **Media Gallery:** Sortable and filterable photos and videos of parks
-- **Image Lightbox & Sharing:** Enlarged views with social sharing
-- **Real-Time Crowd Indicators:** See which parks are busy in real-time
+- **Crowd Indicators:** See which parks are busy based on previous data
+- **Review System:** Users can read and post reviews
+- **Interactive Map:** Park markers with quick-view functionality
 
 ### 🧩 Partially Implemented or In Progress:
-- **Review System:** Users can read and post reviews (likes/dislikes in future)
-- **Interactive Map (basic):** Park markers with quick-view functionality
+- **Enhanced Park Map Layers:** Trails and POIs not yet integrated
+- **Review Reactions & Moderation:** Likes, flags, and star ratings pending
+- **Trip Planning Tools:** Calendar and itinerary features postponed
+- **Admin Dashboard & Monitoring:** Admin tools scoped for post-MVP
+- **App Customization & Legal Pages:** Theming and policies deferred
+- **Platform Background & Media Info:** Content pages to be added later
 
 ---
 
@@ -41,7 +46,7 @@ Our focus during this project was on building a functional MVP with real-world u
 - **Frontend:** React, Tailwind CSS, React Router
 - **Backend (Prototype Stage):** Node.js, Express, MySQL
 - **Authentication:** Custom user system with session support
-- **APIs Used:** (Planned) National Park Service API, OpenWeatherMap
+- **APIs Used:** (Planned) National Park Service API
 - **Hosting:** GitHub Pages for frontend; Render (development backend)
 
 ---
@@ -57,9 +62,15 @@ COSC625-Group4Project/
 │   ├── pages/                # Route-based pages
 │   ├── services/             # API service logic
 │   └── styles/               # Tailwind & global styles
+├── nodejsserver/             # Backend Node.js server
+│   ├── db.js                 # Database connection logic
+│   ├── index.js              # Entry point for backend server
+│   ├── package.json          # Backend dependencies and scripts
+│   └── package-lock.json     # Locked versions of dependencies
 ├── .github/workflows/        # GitHub Actions CI (build/test)
 ├── .env                      # Environment variables (local only)
 └── README.md
+
 ```
 
 ---
@@ -81,14 +92,19 @@ COSC625-Group4Project/
 git clone https://github.com/hollywoodchase/COSC625-Group4Project.git
 cd COSC625-Group4Project
 
-# 2. Install frontend dependencies
+# 2. Navigate to the frontend folder
+cd npe-ui
+
+# 3. Install frontend dependencies
 npm install
 
-# 3. Start development server
+# 4. Start development server
 npm start
+
 ```
 
-> ⚠️ Backend services were developed in prototype form using Express. To test full functionality (e.g., login, visit history), clone and run the `nodejsserver/` directory with a local MySQL instance and `.env` file.
+> ✅ The backend is deployed on Render and runs automatically in production. There is no need to manually run the `nodejsserver/` directory locally unless you are testing or developing backend features. All core functionality—such as login, visit history, and review submission—is handled via the live API.
+
 
 ---
 
